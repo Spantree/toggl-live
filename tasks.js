@@ -1,9 +1,12 @@
 var request = require('request');
-var keys = require('./keys');
+var accounts = require('./accounts');
 var _ = require('underscore');
+var through = require('through');
+var Readable = require('stream').Readable;
 
 var CURRENT_URL = 'https://www.toggl.com/api/v8/time_entries/current',
-   USER_DETAILS_URL = 'https://www.toggl.com/api/v8/me';
+  USER_DETAILS_URL = 'https://www.toggl.com/api/v8/me',
+  TASK_DETAILS_URL = 'https://www.toggl.com/api/v8/tasks/';
 
 
 function getHttp(uri, key, cb){
@@ -15,39 +18,70 @@ function getHttp(uri, key, cb){
          'pass': 'api_token'
       }
    }, cb);
-};
-
-function getUserDetails(key, cb){
-   getHttp(USER_DETAILS_URL, key, cb);
-};
+}
 
 function getCurrentTask(key, cb){
    getHttp(CURRENT_URL, key, cb);
-};
+}
+
+function fetchTaskDetails(user, cb){
+  getHttp(TASK_DETAILS_URL + "" + user.tid, user.key, cb);
+}
 
 
-function fetchAllCurrentTasks(usersKeys, cb){
-   var currentTasks = [];
-   var returnTasks = _.after(usersKeys.length, cb);
-   _.each(usersKeys, function(key){
-      getUserDetails(key.user, function(err, response, body){
-         var user = {fullname: JSON.parse(body).data.fullname};
-         console.log("user: ", JSON.parse(body).data.fullname);
-         getCurrentTask(key.user, function(err, response, body){
-            if(JSON.parse(body).data){
-               currentTasks.push({user: user, task: JSON.parse(body).data.description});
-               console.log("Current Task: ", JSON.parse(body).data.description);
-            } else {
-               currentTasks.push({user: user});
-               console.log("No Current Task");
-            }
-            returnTasks(null, currentTasks);
-         });
-      });
-   });
-};
+/*
+ * gets current tasks for all users
+ * @return a list of users with their current tasks.
+ * E.g.: [{name: 'Jon Doe', taskId: 1231}, {name: 'Jane Doe'}]
+ */
+function currentTasksStream(usersAccounts, cb){
+  var currentTasks = [];
+  var returnTasks = _.after(usersAccounts.length, cb);
+  _.each(usersAccounts, function(userAccount){
+    getCurrentTask(userAccount.key, function(err, response, body){
+      if(!err){
+        if(JSON.parse(body).data && JSON.parse(body).data.tid){
+          currentTasks.push({user: {name: userAccount.name, key: userAccount.key, tid: JSON.parse(body).data.tid}});
+          returnTasks(null, currentTasks);
+        } else {
+          currentTasks.push({user: {name: userAccount.name, key: userAccount.key}});
+          returnTasks(null, currentTasks);
+        }
+      }
+    });
+  });
+}
 
-fetchAllCurrentTasks(keys, function(error, currentTasks){
-   console.log("TASKS:::::: ", currentTasks);
+/**
+ * @returns [{name: 'Jon Doe', task: 'Something'}]
+ */
+function tasksDetailsStream(tasks){
+  var self = this ;
+  var tasksWithId = _.filter(JSON.parse(tasks.toString()), function(task){
+    return !_.isUndefined(task.taskId) && !_.isNull(task.taskId);
+  });
+  var tasksWithNoId = _.filter(JSON.parse(tasks.toString()), function(task){
+    return _.isUndefined(task.taskId);
+  });
+  _.each(tasksWithId, function(task){
+    fetchTaskDetails(task, function(err, taskDetails){
+      self.queue(JSON.stringify({name: task.name, currentTask: JSON.parse(taskDetails).data.name}));
+    });
+  });
+  _.each(tasksWithNoId, function(task){
+    self.queue(JSON.stringify({name: task.name}));
+  });
+}
+
+currentTasksStream(accounts, function(error, currentTasks){
+  var readableStream = new Readable();
+  _.each(currentTasks, function(it){
+    console.log(it);
+    readableStream.push(JSON.stringify(it));
+  });
+  readableStream.push(null);
+  readableStream.pipe(through(tasksDetailsStream)).pipe(process.stdout);
 });
+
+
 

@@ -1,3 +1,3 @@
-module.exports = {
-   'user': 'api key goes here',
-};
+module.exports = [
+   {'user': 'add user api key here'}
+]

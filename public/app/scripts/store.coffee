@@ -1,8 +1,7 @@
-Notes.Store = DS.Store.extend(
-  adapter: DS.LSAdapter
-)
+ActivityDashboard.ApplicationAdapter = DS.RESTAdapter.extend
+  namespace: 'api'
 
-Notes.Note = DS.Model.extend(
-  name: DS.attr('string')
-  value: DS.attr('string')
-)
+#ActivityDashboard.Task = DS.Model.extend(
+#  name: DS.attr('string')
+#  task: DS.attr('string')
+#)

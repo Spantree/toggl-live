@@ -1,5 +1,6 @@
 node_modules
 *.swp
+public/.tmp
 .DS_Store
 accounts.js
 bower_components

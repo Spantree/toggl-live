@@ -33,7 +33,7 @@ function fetchDetails(tasks, callback){
   var results = [];
   _tasks.forEach(function(task){
     fetchTaskDetails(task, function(err, response, taskDetails){
-      results.push(JSON.stringify({name: task.user.name, currentTask: JSON.parse(taskDetails).data.name}));
+      results.push({name: task.user.name, currentTask: JSON.parse(taskDetails).data.name});
       cb(null, results);
     });
   });

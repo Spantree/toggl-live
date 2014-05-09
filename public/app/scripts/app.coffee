@@ -1,4 +1,4 @@
-Notes = window.Notes = Ember.Application.create()
+ActivityDashboard = window.ActivityDashboard = Ember.Application.create()
 
 #Order and include as you please. 
 require('scripts/store')

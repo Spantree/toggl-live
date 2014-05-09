@@ -12,7 +12,7 @@ app.get('/', function(req, res, next){
   res.send("Go to '/api/currentTasks'");
 });
 
-app.get('/api/currentTasks', function(req, res, next){
+app.get('/api/tasks', function(req, res, next){
   tasks.getAllTasks(accounts, function(err, data){
     res.json(data);
   });

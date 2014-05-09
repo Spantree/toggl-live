@@ -1,0 +1,17 @@
+<div id="notes" class="azureBlueBackground azureBlueBorderThin">
+  {{input valueBinding="newNoteName"}}
+  <button class="btn btn-default btn-xs" {{action "createNewNote"}}>New Note</button>
+
+  <div class="list-group" style="margin-top: 10px">
+    {{#each controller}}
+      {{#link-to "notes.note" this class="list-group-item"}}
+        {{name}}
+        <button class="btn btn-danger btn-xs pull-right" {{action "doDeleteNote" this}}>Delete</button>
+      {{/link-to}}
+    {{/each}}
+  </div>
+</div>
+
+{{ outlet }}
+{{ partial "confirmDialog" }}
+

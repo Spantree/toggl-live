@@ -57,6 +57,7 @@ function currentTasksStream(usersAccounts, cb){
   });
 }
 
+
 function joinTasks(idle, busy){
   var idleUsers = _.values(idle);
   idleUsers.forEach(function(idleUser){

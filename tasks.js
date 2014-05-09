@@ -1,8 +1,7 @@
+'use strict';
 var request = require('request');
 var accounts = require('./accounts');
 var _ = require('underscore');
-var through = require('through');
-var Readable = require('stream').Readable;
 
 var CURRENT_URL = 'https://www.toggl.com/api/v8/time_entries/current',
   USER_DETAILS_URL = 'https://www.toggl.com/api/v8/me',
@@ -25,15 +24,21 @@ function getCurrentTask(key, cb){
 }
 
 function fetchTaskDetails(user, cb){
-  getHttp(TASK_DETAILS_URL + "" + user.tid, user.key, cb);
+  getHttp(TASK_DETAILS_URL + "" + user.user.tid, user.user.key, cb);
 }
 
+function fetchDetails(tasks, callback){
+  var _tasks = JSON.parse(tasks);
+  var cb = _.after(_tasks.length, callback);
+  var results = [];
+  _tasks.forEach(function(task){
+    fetchTaskDetails(task, function(err, response, taskDetails){
+      results.push(JSON.stringify({name: task.user.name, currentTask: JSON.parse(taskDetails).data.name}));
+      cb(null, results);
+    });
+  });
+}
 
-/*
- * gets current tasks for all users
- * @return a list of users with their current tasks.
- * E.g.: [{name: 'Jon Doe', taskId: 1231}, {name: 'Jane Doe'}]
- */
 function currentTasksStream(usersAccounts, cb){
   var currentTasks = [];
   var returnTasks = _.after(usersAccounts.length, cb);
@@ -52,36 +57,37 @@ function currentTasksStream(usersAccounts, cb){
   });
 }
 
-/**
- * @returns [{name: 'Jon Doe', task: 'Something'}]
- */
-function tasksDetailsStream(tasks){
-  var self = this ;
-  var tasksWithId = _.filter(JSON.parse(tasks.toString()), function(task){
-    return !_.isUndefined(task.taskId) && !_.isNull(task.taskId);
+function joinTasks(idle, busy){
+  var idleUsers = _.values(idle);
+  idleUsers.forEach(function(idleUser){
+    busy.push({name: idleUser.user.name});
   });
-  var tasksWithNoId = _.filter(JSON.parse(tasks.toString()), function(task){
-    return _.isUndefined(task.taskId);
-  });
-  _.each(tasksWithId, function(task){
-    fetchTaskDetails(task, function(err, taskDetails){
-      self.queue(JSON.stringify({name: task.name, currentTask: JSON.parse(taskDetails).data.name}));
+  return busy;
+}
+
+
+function getAllTasks(userAccounts, cb){
+  currentTasksStream(userAccounts, function(err, userTasks){
+    var idleUsers = _.filter(userTasks, function(it){
+      return _.isUndefined(it.user.tid);
     });
-  });
-  _.each(tasksWithNoId, function(task){
-    self.queue(JSON.stringify({name: task.name}));
+    var busyUsers = _.difference(userTasks, idleUsers);
+    if(busyUsers.length > 0){
+      fetchDetails(JSON.stringify(busyUsers), function(err, currentTasks){
+        cb(null, joinTasks(idleUsers, currentTasks));
+      });
+    } else {
+        cb(null, joinTasks(idleUsers, []));
+    }
   });
 }
 
-currentTasksStream(accounts, function(error, currentTasks){
-  var readableStream = new Readable();
-  _.each(currentTasks, function(it){
-    console.log(it);
-    readableStream.push(JSON.stringify(it));
-  });
-  readableStream.push(null);
-  readableStream.pipe(through(tasksDetailsStream)).pipe(process.stdout);
+/*
+getAllTasks(accounts, function(err, data){
+  console.log("TASKS: ", data);
 });
+*/
 
-
-
+module.exports = {
+  getAllTasks: getAllTasks
+};

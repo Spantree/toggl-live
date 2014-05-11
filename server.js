@@ -14,7 +14,14 @@ app.get('/', function(req, res, next){
 
 app.get('/api/tasks', function(req, res, next){
   tasks.getAllTasks(accounts, function(err, data){
-    res.json(data);
+    var formattedResponse = data.map(function(item){
+       var task = {id: item.name, name: item.name};
+       if(item.currentTask){
+          task['currentTask'] = item.currentTask;
+       }
+       return task;
+    });
+    res.json({tasks: formattedResponse});
   });
 });
 

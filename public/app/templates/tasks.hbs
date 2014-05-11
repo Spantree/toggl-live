@@ -1,6 +1,18 @@
-<h4>Activities</h4>
-<ul>
-  {{#each model}}
-  <li>{{{ name }}}: {{{ task }}}</li>
-  {{/each}}
-</ul>
+<h3>Activities</h3>
+
+<div class="table-responsive">
+   <table class="table table-bordered">
+      <thead>
+         <td>Developer</td>
+         <td>Activity</td>
+      </thead>
+      <tbody>
+         {{#each model}}
+         <tr>
+            <td>{{{ name }}}</td>
+            <td>{{{ task }}}</td>
+         </tr>
+         {{/each}}
+      </tbody>
+   </table>
+</div>

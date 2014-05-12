@@ -1,18 +1,22 @@
-<h3>Activities</h3>
+<div class="container">
 
-<div class="table-responsive">
-   <table class="table table-bordered">
-      <thead>
-         <td>Developer</td>
-         <td>Activity</td>
-      </thead>
-      <tbody>
-         {{#each model}}
-         <tr>
-            <td>{{{ name }}}</td>
-            <td>{{{ task }}}</td>
-         </tr>
-         {{/each}}
-      </tbody>
-   </table>
+<h3>Activities</h3>
+    <div class="table-responsive">
+        <table class="table table-bordered">
+            <thead>
+            <td>Developer</td>
+            <td>Activity</td>
+            <td>Project</td>
+            </thead>
+            <tbody>
+            {{#each controller}}
+                <tr>
+                    <td>{{{ name }}}</td>
+                    <td>{{{ task }}}</td>
+                    <td>{{{ project }}}</td>
+                </tr>
+            {{/each}}
+            </tbody>
+        </table>
+    </div>
 </div>

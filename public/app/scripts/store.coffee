@@ -4,4 +4,5 @@ ActivityDashboard.ApplicationAdapter = DS.RESTAdapter.extend
 ActivityDashboard.Task = DS.Model.extend(
   name: DS.attr('string')
   currentTask: DS.attr('string')
+  currentProject: DS.attr('string')
 )

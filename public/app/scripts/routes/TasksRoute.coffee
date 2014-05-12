@@ -14,7 +14,7 @@ ActivityDashboard.TasksRoute = Ember.Route.extend
          Ember.$.getJSON('/api/tasks').then (data) ->
             updatedTasks = data.map (task) ->
               if task["currentTask"]
-                {name: task.name, task: task.currentTask}
+                {name: task.name, task: task.currentTask, project: task.currentProject}
               else
                 {name: task.name, task: 'Idle'}
             controller.set('model', updatedTasks)

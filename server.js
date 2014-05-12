@@ -15,12 +15,16 @@ app.get('/', function(req, res, next){
 app.get('/api/tasks', function(req, res, next){
   tasks.getAllTasks(accounts, function(err, data){
     var formattedResponse = data.map(function(item){
-       var task = {id: item.name, name: item.name};
-       if(item.currentTask){
-          task['currentTask'] = item.currentTask;
-       }
-       return task;
+      var task = {id: item.name, name: item.name};
+      if(item.currentTask){
+        task['currentTask'] = item.currentTask;
+      }
+      if(item.currentProject){
+        task['currentProject'] = item.currentProject;
+      }
+      return task;
     });
+    console.dir(formattedResponse);
     res.json({tasks: formattedResponse});
   });
 });

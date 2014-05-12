@@ -5,48 +5,58 @@ var _ = require('underscore');
 
 var CURRENT_URL = 'https://www.toggl.com/api/v8/time_entries/current',
   USER_DETAILS_URL = 'https://www.toggl.com/api/v8/me',
-  TASK_DETAILS_URL = 'https://www.toggl.com/api/v8/tasks/';
+  TASK_DETAILS_URL = 'https://www.toggl.com/api/v8/tasks/',
+  PROJECT_DETAILS_URL = 'https://www.toggl.com/api/v8/projects/';
 
 
-function getHttp(uri, key, cb){
-   request({
-      method: 'GET',
-      uri: uri,
-      'auth':{
-         'user': key,
-         'pass': 'api_token'
-      }
-   }, cb);
+function getHttp(uri, key, cb) {
+  request({
+    method: 'GET',
+    uri: uri,
+    'auth': {
+      'user': key,
+      'pass': 'api_token'
+    }
+  }, cb);
 }
 
-function getCurrentTask(key, cb){
-   getHttp(CURRENT_URL, key, cb);
+function getCurrentTask(key, cb) {
+  getHttp(CURRENT_URL, key, cb);
 }
 
-function fetchTaskDetails(user, cb){
+function fetchTaskDetails(user, cb) {
   getHttp(TASK_DETAILS_URL + "" + user.user.tid, user.user.key, cb);
 }
 
-function fetchDetails(tasks, callback){
+function fetchProjectDetails(user, cb) {
+  getHttp(PROJECT_DETAILS_URL + "" + user.user.pid, user.user.key, cb);
+}
+
+
+function fetchDetails(tasks, callback) {
   var _tasks = JSON.parse(tasks);
   var cb = _.after(_tasks.length, callback);
   var results = [];
-  _tasks.forEach(function(task){
-    fetchTaskDetails(task, function(err, response, taskDetails){
-      results.push({name: task.user.name, currentTask: JSON.parse(taskDetails).data.name});
-      cb(null, results);
+  _tasks.forEach(function (task) {
+    fetchTaskDetails(task, function (err, response, taskDetails) {
+      var currentTask = JSON.parse(taskDetails).data.name;
+      fetchProjectDetails(task, function (err, response, projectDetails) {
+        var currentProject = JSON.parse(projectDetails).data.name;
+        results.push({name: task.user.name, currentTask: currentTask, currentProject: currentProject});
+        cb(null, results);
+      });
     });
   });
 }
 
-function currentTasksStream(usersAccounts, cb){
+function currentTasksStream(usersAccounts, cb) {
   var currentTasks = [];
   var returnTasks = _.after(usersAccounts.length, cb);
-  _.each(usersAccounts, function(userAccount){
-    getCurrentTask(userAccount.key, function(err, response, body){
-      if(!err){
-        if(JSON.parse(body).data && JSON.parse(body).data.tid){
-          currentTasks.push({user: {name: userAccount.name, key: userAccount.key, tid: JSON.parse(body).data.tid}});
+  _.each(usersAccounts, function (userAccount) {
+    getCurrentTask(userAccount.key, function (err, response, body) {
+      if (!err) {
+        if (JSON.parse(body).data && JSON.parse(body).data.tid) {
+          currentTasks.push({user: {name: userAccount.name, key: userAccount.key, tid: JSON.parse(body).data.tid, pid: JSON.parse(body).data.pid}});
           returnTasks(null, currentTasks);
         } else {
           currentTasks.push({user: {name: userAccount.name, key: userAccount.key}});
@@ -58,36 +68,36 @@ function currentTasksStream(usersAccounts, cb){
 }
 
 
-function joinTasks(idle, busy){
+function joinTasks(idle, busy) {
   var idleUsers = _.values(idle);
-  idleUsers.forEach(function(idleUser){
+  idleUsers.forEach(function (idleUser) {
     busy.push({name: idleUser.user.name});
   });
   return busy;
 }
 
 
-function getAllTasks(userAccounts, cb){
-  currentTasksStream(userAccounts, function(err, userTasks){
-    var idleUsers = _.filter(userTasks, function(it){
+function getAllTasks(userAccounts, cb) {
+  currentTasksStream(userAccounts, function (err, userTasks) {
+    var idleUsers = _.filter(userTasks, function (it) {
       return _.isUndefined(it.user.tid);
     });
     var busyUsers = _.difference(userTasks, idleUsers);
-    if(busyUsers.length > 0){
-      fetchDetails(JSON.stringify(busyUsers), function(err, currentTasks){
+    if (busyUsers.length > 0) {
+      fetchDetails(JSON.stringify(busyUsers), function (err, currentTasks) {
         cb(null, joinTasks(idleUsers, currentTasks));
       });
     } else {
-        cb(null, joinTasks(idleUsers, []));
+      cb(null, joinTasks(idleUsers, []));
     }
   });
 }
 
 /*
-getAllTasks(accounts, function(err, data){
-  console.log("TASKS: ", data);
-});
-*/
+ getAllTasks(accounts, function(err, data){
+ console.log("TASKS: ", data);
+ });
+ */
 
 module.exports = {
   getAllTasks: getAllTasks

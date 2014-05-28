@@ -1,6 +1,5 @@
 'use strict';
 var request = require('request');
-var accounts = require('./accounts');
 var _ = require('underscore');
 
 var CURRENT_URL = 'https://www.toggl.com/api/v8/time_entries/current',
@@ -41,8 +40,12 @@ function fetchDetails(tasks, callback) {
     fetchTaskDetails(task, function (err, response, taskDetails) {
       var currentTask = JSON.parse(taskDetails).data.name;
       fetchProjectDetails(task, function (err, response, projectDetails) {
-        var currentProject = JSON.parse(projectDetails).data.name;
-        results.push({name: task.user.name, currentTask: currentTask, currentProject: currentProject});
+        if(JSON.parse(projectDetails)){
+          var currentProject = JSON.parse(projectDetails).data.name;
+          results.push({name: task.user.name, currentTask: currentTask, currentProject: currentProject});
+        }else{
+          results.push({name: task.user.name});
+        }
         cb(null, results);
       });
     });

@@ -2,14 +2,18 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var tasks = require('./tasks');
-var accounts = require('./accounts');
+var nconf = require('nconf');
+var fs = require('fs');
+
+var accounts, PORT = 3000,
+  USER_ACCOUNTS_FILE = process.env.HOME + '/.node-configs/user-admin.json';
 
 var app = express();
 app.use(bodyParser());
 
 
 app.get('/', function(req, res, next){
-  res.send("Go to '/api/currentTasks'");
+  res.send("Go to '/api/tasks'");
 });
 
 app.get('/api/tasks', function(req, res, next){
@@ -24,11 +28,18 @@ app.get('/api/tasks', function(req, res, next){
       }
       return task;
     });
-    console.dir(formattedResponse);
     res.json({tasks: formattedResponse});
   });
 });
 
 
-app.listen(3000);
+app.listen(PORT, function(){
+  console.log("Started server on port ", PORT);
+
+  nconf.argv()
+    .env()
+    .file({file: USER_ACCOUNTS_FILE});
+  accounts = nconf.get('user_accounts');
+
+});
 

@@ -1,6 +1,12 @@
 {
-  "name": "notes",
-  "version": "0.0.0",
+  "name": "toggl-live-ember-client",
+  "version": "0.0.1",
+  "description": "Ember client for live feed of toggl tasks.",
+  "author": "Roberto Guerra",
+  "license": "MIT",
+  "repository":{
+    "type": "git"
+  },
   "dependencies": {},
   "devDependencies": {
     "connect-livereload": "~0.2.0",

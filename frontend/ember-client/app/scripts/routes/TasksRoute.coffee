@@ -1,12 +1,12 @@
 ActivityDashboard.TasksRoute = Ember.Route.extend
   model: ->
-     @store.find('task')
-     #Ember.$.getJSON('http://localhost:9000/api/tasks').then (data) ->
-     #  data.map (task) ->
-     #    if task["currentTask"]
-     #      {name: task.name, task: task.currentTask, status: 'busy'}
-     #    else
-     #      {name: task.name, task: 'Idle', status: 'available'}
+     #@store.find('task')
+     Ember.$.getJSON('http://localhost:9000/api/tasks').then (data) ->
+       data.map (task) ->
+         if task["currentTask"]
+           {name: task.name, task: task.currentTask, status: 'busy'}
+         else
+           {name: task.name, task: 'Idle', status: 'available'}
 
    setupController: (controller, tasks) ->
       controller.set('model', tasks)
@@ -22,5 +22,10 @@ ActivityDashboard.TasksRoute = Ember.Route.extend
          return
       , 1200000
       return
+
+    actions:
+      error: (reason, transition) ->
+        if reason.status == 401
+          window.location = 'http://localhost:3000/login'
 
     

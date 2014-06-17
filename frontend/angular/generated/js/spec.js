@@ -3410,6 +3410,7 @@ describe("directive: shows-message-when-hovered (vanilla jasmine, coffeescript)"
     });
     Given(function() {
       var _this = this;
+
       return inject(function($http, AuthenticationService) {
         _this.AuthenticationService = AuthenticationService;
         _this.$httpPost = spyOn($http, 'post');

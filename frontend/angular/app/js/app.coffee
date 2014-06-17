@@ -8,3 +8,5 @@ angular.module("app", ["ngResource", "ngRoute"]).run ($rootScope) ->
   $rootScope.alert = (thing) ->
     alert(thing)
 
+  console.log "Starting app..."
+

@@ -8,3 +8,6 @@ bower_components
 .idea
 
 *.iml
+
+frontend/ember-client/.tmp
+public/

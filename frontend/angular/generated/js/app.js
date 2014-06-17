@@ -23352,14 +23352,14 @@ function ngViewFillContentFactory($compile, $controller, $route) {
 }).call(this);
 
 (function() {
-  'use strict';
-  angular.module("app", ["ngResource", "ngRoute"]).run(function($rootScope) {
+  'use strict';  angular.module("app", ["ngResource", "ngRoute"]).run(function($rootScope) {
     $rootScope.log = function(thing) {
       return console.log(thing);
     };
-    return $rootScope.alert = function(thing) {
+    $rootScope.alert = function(thing) {
       return alert(thing);
     };
+    return console.log("Starting app...");
   });
 
 }).call(this);
@@ -23374,6 +23374,7 @@ function ngViewFillContentFactory($compile, $controller, $route) {
 (function() {
   angular.module("app").controller('HomeController', function($scope, $location, AuthenticationService) {
     var onLogoutSuccess;
+
     $scope.title = "Home";
     $scope.message = "Mouse Over these images to see a directive at work";
     onLogoutSuccess = function(response) {
@@ -23389,6 +23390,7 @@ function ngViewFillContentFactory($compile, $controller, $route) {
 (function() {
   angular.module("app").controller('LoginController', function($scope, $location, AuthenticationService) {
     var onLoginSuccess;
+
     $scope.credentials = {
       username: "",
       password: ""
@@ -23407,6 +23409,7 @@ function ngViewFillContentFactory($compile, $controller, $route) {
   angular.module("app").directive("showsMessageWhenHovered", function() {
     return function(scope, element, attributes) {
       var originalMessage;
+
       originalMessage = scope.message;
       element.bind("mouseenter", function() {
         scope.message = attributes.message;
@@ -23444,7 +23447,7 @@ function ngViewFillContentFactory($compile, $controller, $route) {
       controller: 'BooksController'
     });
     return $routeProvider.otherwise({
-      redirectTo: '/login'
+      redirectTo: '/home'
     });
   });
 
@@ -23467,6 +23470,7 @@ function ngViewFillContentFactory($compile, $controller, $route) {
 (function() {
   angular.module("app").factory("BookService", function($q, $http) {
     var getBooks;
+
     getBooks = function() {
       return $http.get('/books');
     };

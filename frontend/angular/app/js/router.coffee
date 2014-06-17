@@ -17,5 +17,5 @@ angular.module("app").config ($routeProvider, $locationProvider) ->
     controller: 'BooksController'
   })
 
-  $routeProvider.otherwise({ redirectTo: '/login' })
+  $routeProvider.otherwise({ redirectTo: '/home' })
 

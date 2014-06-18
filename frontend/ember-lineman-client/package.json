@@ -1,0 +1,16 @@
+{
+  "name": "ember-lineman-client",
+  "description": "An HTML/JS/CSS app",
+  "version": "0.0.1",
+  "private": true,
+  "author": "John Doe",
+  "devDependencies": {
+    "coffeeify": "^0.5.2",
+    "lineman": "^0.33.2",
+    "lineman-ember": "0.0.3"
+  },
+  "scripts": {
+    "start": "lineman run",
+    "test": "lineman spec-ci"
+  }
+}

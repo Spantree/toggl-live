@@ -1,13 +1,14 @@
 {
   "name": "toggl-live",
   "version": "0.0.1",
+  "private": "true",
   "description": "Live feed of current toggl tasks.",
-  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Roberto Guerra",
-  "license": "MIT",
+  "author": {
+    "company": "Spantree LLC"
+  },
   "dependencies": {
     "body-parser": "^1.0.2",
     "connect-flash": "^0.1.1",

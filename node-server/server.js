@@ -9,6 +9,7 @@ var passport = require('passport');
 var GoogleStrategy = require('passport-google').Strategy;
 var session = require('express-session');
 var flash = require('connect-flash');
+var _ = require('underscore');
 
 var accounts, PORT = 3000,
   USER_ACCOUNTS_FILE = process.env.HOME + '/.node-configs/user-admin.json';
@@ -33,6 +34,16 @@ app.get('/', function(req, res, next){
   }
 });
 
+function ensureAuthenticated(req, res, next){
+  if(req.isAuthenticated()){
+    return next();
+  }
+  //res.redirect('/login');
+  res.status(401);
+  res.json({error: "Unauthorized"});
+}
+
+
 app.get('/index', ensureAuthenticated, function(req, res){
   res.render('index');
 });
@@ -49,7 +60,10 @@ app.get('/api/tasks', ensureAuthenticated, function(req, res, next){
       }
       return task;
     });
-    res.json({tasks: formattedResponse});
+    res.json({
+      tasks: formattedResponse,
+      user: {name: req.user.displayName, email: _.first(req.user.emails).value}
+    });
   });
 });
 
@@ -99,13 +113,4 @@ app.listen(PORT, function(){
   accounts = nconf.get('user_accounts');
 
 });
-
-function ensureAuthenticated(req, res, next){
-  if(req.isAuthenticated()){
-    return next();
-  }
-  //res.redirect('/login');
-  res.status(401);
-  res.json({error: "Unauthorized"});
-}
 

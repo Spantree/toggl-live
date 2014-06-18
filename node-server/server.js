@@ -10,6 +10,7 @@ var GoogleStrategy = require('passport-google').Strategy;
 var session = require('express-session');
 var flash = require('connect-flash');
 var _ = require('underscore');
+var ensureAuthenticated = require('./ensureAuthenticated');
 
 var accounts, PORT = 3000,
   USER_ACCOUNTS_FILE = process.env.HOME + '/.node-configs/user-admin.json';
@@ -26,23 +27,9 @@ app.use(passport.session());
 app.use(flash());
 
 
-app.get('/', function(req, res, next){
-  if(req.isAuthenticated()){
-    res.redirect('/index');
-  } else {
-    res.redirect('/login');
-  }
+app.get('/', ensureAuthenticated, function(req, res, next){
+  res.redirect('/index');
 });
-
-function ensureAuthenticated(req, res, next){
-  if(req.isAuthenticated()){
-    return next();
-  }
-  //res.redirect('/login');
-  res.status(401);
-  res.json({error: "Unauthorized"});
-}
-
 
 app.get('/index', ensureAuthenticated, function(req, res){
   res.render('index');
@@ -100,7 +87,7 @@ app.get('/auth/google',
 app.get('/auth/google/return',
        passport.authenticate('google', {failureRedirect: '/login'}),
        function(req, res){
-         res.redirect('/index');
+         res.redirect('/');
        }
 );
 

@@ -20,7 +20,10 @@ module.exports = {
     app.get('/api/tasks', function(req, res){
       res.json({
         "tasks":[
-          {"id":"Roberto","name":"Roberto","currentTask":"Troubleshooting","currentProject":"HostedBuyer"}
+          {"id":"Roberto","name":"Roberto","currentTask":"Troubleshooting","currentProject":"HostedBuyer"},
+          {"id":"Jon","name":"Jon","currentTask":"Idle","currentProject":"HostedBuyer"},
+          {"id":"Jane","name":"Jane","currentTask":"Deploying","currentProject":"HostedBuyer"},
+          {"id":"Charles","name":"Charles","currentTask":"Adding a feature","currentProject":"HostedBuyer"}
         ],
         "meta": {"user": {"id": "dev@spantree.net", "name": "Dev User", "email": "dev@spantree.net"}}
       });

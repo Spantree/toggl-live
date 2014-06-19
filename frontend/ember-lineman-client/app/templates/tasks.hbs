@@ -1,22 +1,18 @@
-<div class="container">
+<div class="row">
 
 <h3>Activities</h3>
-    <div class="table-responsive">
-        <table class="table table-bordered">
-            <thead>
-            <td>Developer</td>
-            <td>Activity</td>
-            <td>Project</td>
-            </thead>
-            <tbody>
-            {{#each controller}}
-                <tr>
-                    <td>{{{ name }}}</td>
-                    <td>{{{ task }}}</td>
-                    <td>{{{ project }}}</td>
-                </tr>
-            {{/each}}
-            </tbody>
-        </table>
+<div class="bootcards-list">
+  <div class="panel panel-default">
+    <div class="list-group">
+      {{#each controller}}
+        <a class="list-group-item" target="#">
+          <h4 class="list-group-item-heading">{{{ name }}}</h4>
+          <p> {{{ task }}} </p>
+          <p> {{{ project }}} </p>
+        </a>
+      {{/each}}
     </div>
+  </div>
+</div>
+
 </div>

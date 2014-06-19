@@ -13,7 +13,7 @@ var _ = require('underscore');
 var ensureAuthenticated = require('./ensureAuthenticated');
 
 var accounts, PORT = 3000,
-  USER_ACCOUNTS_FILE = process.env.HOME + '/.node-configs/user-admin.json';
+  USER_ACCOUNTS_FILE = process.env.HOME + '/.node-configs/toggl-users.json';
 
 var app = express();
 app.use(bodyParser());
@@ -27,11 +27,11 @@ app.use(passport.session());
 app.use(flash());
 
 
-app.get('/', ensureAuthenticated, function(req, res, next){
+app.get('/', function(req, res, next){
   res.redirect('/index');
 });
 
-app.get('/index', ensureAuthenticated, function(req, res){
+app.get('/index', function(req, res){
   res.render('index');
 });
 

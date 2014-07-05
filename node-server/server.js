@@ -27,32 +27,59 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
 
+function isValidAccount(userEmails, accounts) {
+  var emails = _.map(accounts, function(it){
+    return it.email;
+  });
+  var authenticatedEmail = _.map(userEmails, function(it){
+    return it.value;
+  });
+  return _.contains(emails, _.first(authenticatedEmail));
+}
 
-app.get('/', function(req, res, next){
-  res.redirect('/index');
+app.get('/unauthorized', function(req, res){
+  res.status(401);
+  res.render("401");
 });
 
-app.get('/index', function(req, res){
-  res.render('index');
+
+app.get('/', function(req, res, next){
+  if(isValidAccount(req.user.emails, accounts)){
+    res.redirect('/index');
+  } else {
+    res.redirect("/unauthorized");
+  }
+});
+
+app.get('/index', ensureAuthenticated, function(req, res){
+  if(isValidAccount(req.user.emails, accounts)) {
+    res.render('index');
+  } else {
+    res.redirect('/unauthorized');
+  }
 });
 
 app.get('/api/tasks', ensureAuthenticated, function(req, res, next){
-  tasks.getAllTasks(accounts, function(err, data){
-    var formattedResponse = data.map(function(item){
-      var task = {id: item.name, name: item.name};
-      if(item.currentTask){
-        task['currentTask'] = item.currentTask;
-      }
-      if(item.currentProject){
-        task['currentProject'] = item.currentProject;
-      }
-      return task;
+  if(isValidAccount(req.user.emails, accounts)) {
+    tasks.getAllTasks(accounts, function(err, data){
+      var formattedResponse = data.map(function(item){
+        var task = {id: item.name, name: item.name};
+        if(item.currentTask){
+          task['currentTask'] = item.currentTask;
+        }
+        if(item.currentProject){
+          task['currentProject'] = item.currentProject;
+        }
+        return task;
+      });
+      res.json({
+        tasks: formattedResponse,
+        user: {name: req.user.displayName, email: _.first(req.user.emails).value}
+      });
     });
-    res.json({
-      tasks: formattedResponse,
-      user: {name: req.user.displayName, email: _.first(req.user.emails).value}
-    });
-  });
+  } else {
+    res.redirect("/unauthorized");
+  }
 });
 
 passport.serializeUser(function(user, done){
@@ -88,7 +115,11 @@ app.get('/auth/google',
 app.get('/auth/google/return',
        passport.authenticate('google', {failureRedirect: '/login'}),
        function(req, res){
-         res.redirect('/');
+         if(isValidAccount(req.user.emails, accounts)) {
+           res.redirect('/');
+         } else {
+           res.redirect("/unauthorized");
+         }
        }
 );
 

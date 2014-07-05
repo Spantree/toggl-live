@@ -1,14 +1,14 @@
+<h3>Activities</h3>
 <div class="row">
 
-<h3>Activities</h3>
 <div class="bootcards-list">
   <div class="panel panel-default">
     <div class="list-group">
       {{#each controller}}
-        <a class="list-group-item" target="#">
+      <a target="#" {{bind-attr class="isAvailable"}} >
           <h4 class="list-group-item-heading">{{{ name }}}</h4>
-          <p> {{{ task }}} </p>
-          <p> {{{ project }}} </p>
+          <p class="list-group-item-text"> {{{ task }}} </p>
+          <p class="list-group-item-text"> {{{ project }}} </p>
         </a>
       {{/each}}
     </div>

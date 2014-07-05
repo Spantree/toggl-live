@@ -13,7 +13,7 @@ ActivityDashboard.TasksRoute = Ember.Route.extend
 
   actions:
     error: (reason, transition) ->
-      console.log "REASON: ", reason
+      console.error "REASON: ", reason
       if reason.status == 401
         window.location = '/login'
 

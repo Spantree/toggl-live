@@ -96,12 +96,6 @@ function getAllTasks(userAccounts, cb) {
   });
 }
 
-/*
- getAllTasks(accounts, function(err, data){
- console.log("TASKS: ", data);
- });
- */
-
 module.exports = {
   getAllTasks: getAllTasks
 };

@@ -37,7 +37,7 @@ bower install
 ```
 
 6. Add the Toggl keys:
-Add the toggl api keys for any user you want to list in the activity dashboard to the ~/.node-configs/user-admin.json file. E.g.:
+Add the toggl api keys for any user you want to list in the activity dashboard to the ~/.node-configs/toggl-users.json file. E.g.:
 ```javascript
 {
   "user_accounts":[

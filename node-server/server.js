@@ -1,4 +1,5 @@
 'use strict';
+
 var express = require('express');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
@@ -98,6 +99,5 @@ app.listen(PORT, function(){
     .env()
     .file({file: USER_ACCOUNTS_FILE});
   accounts = nconf.get('user_accounts');
-
 });
 
